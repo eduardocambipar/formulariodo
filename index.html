@@ -379,6 +379,19 @@
   .cond{margin-top:14px; padding:14px 16px 4px; border-left:2px solid var(--accent-soft-border); display:none;}
   .cond.show{display:block;}
 
+  /* ---------- prefixo "R$" / "-R$" para campos de preço ---------- */
+  .price-field{position:relative;}
+  .price-field input{padding-left:46px;}
+  .price-field .price-prefix{
+    position:absolute; left:1px; top:1px; bottom:1px; width:40px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12.5px; font-weight:700; color:var(--text-muted);
+    background:var(--surface-muted); border-right:1px solid var(--border-strong);
+    border-radius:calc(var(--radius-field) - 1px) 0 0 calc(var(--radius-field) - 1px);
+    pointer-events:none;
+  }
+  .price-field .price-prefix.neg{color:var(--required);}
+
   .upload-btn{
     display:inline-flex; align-items:center; gap:8px; border:1px solid var(--border-strong);
     background:var(--surface-muted); color:var(--text); font-size:13.5px; font-weight:600;
@@ -713,7 +726,7 @@
         <div class="q">
           <div class="q-head"><span class="q-num">MO10</span><span class="q-title">Salário de referência praticado hoje, se souber</span></div>
           <div class="map-tag">→ coluna própria · Salário de Referência</div>
-          <input type="text" data-field="salario" placeholder="Opcional">
+          <div class="price-field"><span class="price-prefix">R$</span><input type="text" data-field="salario" placeholder="Opcional"></div>
         </div>
 
         <div class="q">
@@ -812,7 +825,7 @@
             <div class="q" style="padding-bottom:0;">
               <div class="q-head"><span class="q-title">Preço de aluguel ou compra do equipamento</span></div>
               <div class="map-tag">→ apoio (vai junto com as observações)</div>
-              <input type="text" data-field="precoTerceiro" placeholder='Ex.: "R$ 3.500/mês (aluguel)" ou "R$ 45.000 (compra)"'>
+              <div class="price-field"><span class="price-prefix">R$</span><input type="text" data-field="precoTerceiro" placeholder='Ex.: "3.500/mês (aluguel)" ou "45.000 (compra)"'></div>
             </div>
           </div>
         </div>
@@ -973,7 +986,7 @@
             <div class="q" style="padding-bottom:0;">
               <div class="q-head"><span class="q-title">Preço por viagem</span></div>
               <div class="map-tag">→ aba DO, coluna Q · Custo/viagem - TERCEIRO</div>
-              <input type="text" data-field="precoViagemTerceiro" placeholder='Ex.: "R$ 450/viagem"'>
+              <div class="price-field"><span class="price-prefix">R$</span><input type="text" data-field="precoViagemTerceiro" placeholder='Ex.: "450/viagem"'></div>
             </div>
           </div>
         </div>
@@ -986,61 +999,81 @@
         </div>
 
         <div class="q">
-          <div class="q-head"><span class="q-num">R11</span><span class="cat-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Destinação</span><span class="q-title">Já existe um destinador definido para este resíduo?</span></div>
-          <div class="map-tag">→ aba DO, colunas O e P</div>
-          <div class="choices row">
-            <div class="choice"><input type="radio" name="dest-1" data-gate="dest-1" value="sim" id="de1-1"><label for="de1-1">Sim</label></div>
-            <div class="choice"><input type="radio" name="dest-1" data-gate="dest-1" value="nao" id="de1-2" checked><label for="de1-2">Não</label></div>
+          <div class="q-head"><span class="q-num">R11</span><span class="cat-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17h13V6H3zM16 10h3l3 3v4h-6zM7.5 20.5a2 2 0 100-4 2 2 0 000 4zM17.5 20.5a2 2 0 100-4 2 2 0 000 4z"/></svg>Transporte</span><span class="q-title">Peso estimado por viagem</span></div>
+          <div class="map-tag">→ aba DO, coluna Peso por Viagem (t)</div>
+          <input type="number" step="0.01" data-field="pesoViagem" placeholder="Ex.: 1.2">
+          <div class="hint">Em toneladas. Deixe em branco se não souber.</div>
+        </div>
+
+        <div class="q">
+          <div class="q-head"><span class="q-num">R12</span><span class="cat-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Destinação</span><span class="q-title">Este resíduo tem valorização ou precisa de destinação? <span class="req">*</span></span></div>
+          <div class="q-desc">Valorização: a Ambipar (ou o cliente) recebe algo por este resíduo. Destinação: há custo para dar o destino correto a ele.</div>
+          <div class="map-tag">→ aba DO, colunas O, P e R</div>
+          <div class="choices">
+            <div class="choice"><input type="radio" name="condcom-1" data-gate="condcom-1" value="destinacao" id="cc1-1" checked><label for="cc1-1">Destinação (há custo)</label></div>
+            <div class="choice"><input type="radio" name="condcom-1" data-gate="condcom-1" value="valorizacao" id="cc1-2"><label for="cc1-2">Valorização (a Ambipar/cliente recebe)</label></div>
           </div>
-          <div class="q" style="padding-top:2px;">
-            <div class="q-head"><span class="q-num">R12</span><span class="q-title">Nome do destinador</span></div>
-            <div class="map-tag">→ aba DO, coluna P · Destinador</div>
-            <input type="text" data-field="nomeDestinador" placeholder="Nome da empresa, se já tiver">
-          </div>
-          <div class="q" style="padding-bottom:0;">
-            <div class="q-head"><span class="q-num">R13</span><span class="q-title">Custo do destinador</span></div>
-            <div class="map-tag">→ aba DO, coluna R · Custo/destinação</div>
-            <input type="text" data-field="custoDestinador" placeholder='Ex.: "R$ 25/ton"'>
-          </div>
-          <div class="cond" data-cond-for="dest-1" data-show-when="sim">
+
+          <div class="cond show" data-cond-for="condcom-1" data-show-when="destinacao">
             <div class="q">
-              <div class="q-head"><span class="q-num">R14</span><span class="q-title">Cidade/UF do destinador</span></div>
-              <div class="map-tag">→ aba DO, coluna P (junto do nome do destinador)</div>
-              <input type="text" data-field="cidadeDestinador" placeholder="Ex.: Serra/ES">
+              <div class="q-head"><span class="q-num">R13</span><span class="q-title">Já existe um destinador definido para este resíduo?</span></div>
+              <div class="map-tag">→ aba DO, colunas O e P</div>
+              <div class="choices row">
+                <div class="choice"><input type="radio" name="dest-1" data-gate="dest-1" value="sim" id="de1-1"><label for="de1-1">Sim</label></div>
+                <div class="choice"><input type="radio" name="dest-1" data-gate="dest-1" value="nao" id="de1-2" checked><label for="de1-2">Não</label></div>
+              </div>
+            </div>
+            <div class="q" style="padding-top:2px;">
+              <div class="q-head"><span class="q-num">R14</span><span class="q-title">Nome do destinador</span></div>
+              <div class="map-tag">→ aba DO, coluna P · Destinador</div>
+              <input type="text" data-field="nomeDestinador" placeholder="Nome da empresa, se já tiver">
+            </div>
+            <div class="q">
+              <div class="q-head"><span class="q-num">R15</span><span class="q-title">Custo da destinação</span></div>
+              <div class="map-tag">→ aba DO, coluna R · Custo/destinação</div>
+              <div class="price-field"><span class="price-prefix">R$</span><input type="text" data-field="custoDestinador" placeholder='Ex.: "25/ton"'></div>
+            </div>
+            <div class="cond" data-cond-for="dest-1" data-show-when="sim">
+              <div class="q">
+                <div class="q-head"><span class="q-num">R16</span><span class="q-title">Cidade/UF do destinador</span></div>
+                <div class="map-tag">→ aba DO, coluna P (junto do nome do destinador)</div>
+                <input type="text" data-field="cidadeDestinador" placeholder="Ex.: Serra/ES">
+              </div>
+              <div class="q" style="padding-bottom:0;">
+                <div class="q-head"><span class="q-num">R17</span><span class="q-title">Tecnologia de destinação, se souber</span></div>
+                <div class="map-tag">→ aba DO, coluna O · Tratamento</div>
+                <select data-field="tecnologia">
+                  <option>Reciclagem</option>
+                  <option>Aterro classe I</option>
+                  <option>Aterro classe II</option>
+                  <option>Compostagem</option>
+                  <option>Coprocessamento</option>
+                  <option>Valorização energética</option>
+                  <option>Descaracterização</option>
+                  <option>Não sei</option>
+                </select>
+              </div>
             </div>
             <div class="q" style="padding-bottom:0;">
-              <div class="q-head"><span class="q-num">R15</span><span class="q-title">Tecnologia de destinação, se souber</span></div>
-              <div class="map-tag">→ aba DO, coluna O · Tratamento</div>
-              <select data-field="tecnologia">
-                <option>Reciclagem</option>
-                <option>Aterro classe I</option>
-                <option>Aterro classe II</option>
-                <option>Compostagem</option>
-                <option>Coprocessamento</option>
-                <option>Valorização energética</option>
-                <option>Descaracterização</option>
-                <option>Não sei</option>
-              </select>
+              <div class="q-head"><span class="q-num">R18</span><span class="q-title">Taxa mínima de enchimento do equipamento</span></div>
+              <div class="map-tag">→ apoio (aba Dados de Apoio)</div>
+              <input type="text" data-field="taxaMinima" placeholder='Ex.: "só é retirado com 70% de ocupação"'>
             </div>
           </div>
-        </div>
 
-        <div class="q">
-          <div class="q-head"><span class="q-num">R16</span><span class="q-title">Preço ou condição comercial já praticada hoje, se houver</span></div>
-          <div class="q-desc">Se for compra do material (a Ambipar paga pelo resíduo), informe o valor em reais com sinal negativo — ex.: "-R$ 180/ton".</div>
-          <div class="map-tag">→ apoio (aba Dados de Apoio)</div>
-          <textarea data-field="preco" placeholder='Opcional — ex.: "-R$ 180/ton (compra)" ou "R$ 25/ton (custo de destinação)"'></textarea>
-        </div>
-
-        <div class="q">
-          <div class="q-head"><span class="q-num">R17</span><span class="q-title">Taxa mínima de enchimento do equipamento</span></div>
-          <div class="map-tag">→ apoio (aba Dados de Apoio)</div>
-          <input type="text" data-field="taxaMinima" placeholder='Ex.: "só é retirado com 70% de ocupação"'>
+          <div class="cond" data-cond-for="condcom-1" data-show-when="valorizacao">
+            <div class="q" style="padding-bottom:0;">
+              <div class="q-head"><span class="q-num">R19</span><span class="q-title">Valor pago pela Ambipar/cliente por este resíduo</span></div>
+              <div class="q-desc">Já sai em valor negativo — é uma receita/desconto, não um custo.</div>
+              <div class="map-tag">→ apoio (aba Dados de Apoio)</div>
+              <div class="price-field"><span class="price-prefix neg">-R$</span><input type="text" data-field="preco" placeholder='Ex.: "180/ton"'></div>
+            </div>
+          </div>
         </div>
 
         <div class="cond" data-cond-for="tipo-1" data-show-when="Sucata metálica">
           <div class="q">
-            <div class="q-head"><span class="q-num">R18</span><span class="cat-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6z"/></svg>Laudo</span><span class="q-title">Precisa de Laudo de Destruição/Descaracterização para este item?</span></div>
+            <div class="q-head"><span class="q-num">R20</span><span class="cat-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6z"/></svg>Laudo</span><span class="q-title">Precisa de Laudo de Destruição/Descaracterização para este item?</span></div>
             <div class="q-desc">Pergunta específica para sucata metálica — some para os demais tipos de resíduo.</div>
             <div class="map-tag">→ apoio (aba Dados de Apoio)</div>
             <div class="choices row">
@@ -1051,7 +1084,7 @@
         </div>
 
         <div class="q" style="padding-bottom:2px;">
-          <div class="q-head"><span class="q-num">R19</span><span class="q-title">Fotos deste resíduo ou do local de acondicionamento</span></div>
+          <div class="q-head"><span class="q-num">R21</span><span class="q-title">Fotos deste resíduo ou do local de acondicionamento</span></div>
           <div class="map-tag">→ aba FOTOS (anexadas ao Excel)</div>
           <label class="upload-btn">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
@@ -1060,6 +1093,19 @@
           </label>
           <div class="hint">Até 10 fotos · 5MB cada · JPG ou PNG</div>
           <div class="dl-status" data-role="photoList"></div>
+        </div>
+
+        <div class="q" style="padding-bottom:2px;">
+          <div class="q-head"><span class="q-num">R22</span><span class="q-title">Documentos deste resíduo, se pertinente</span></div>
+          <div class="q-desc">Contratos, laudos, fichas técnicas — qualquer documento de apoio para este item.</div>
+          <div class="map-tag">→ fica anexado aqui neste formulário</div>
+          <label class="upload-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+            Carregar arquivo
+            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,image/jpeg,image/png" multiple data-field="documentos" style="position:absolute; width:1px; height:1px; opacity:0; overflow:hidden;">
+          </label>
+          <div class="hint">Até 5 arquivos · 10MB cada · PDF, Word, Excel ou imagem</div>
+          <div class="dl-status" data-role="docList"></div>
         </div>
 
       </div>
@@ -1077,8 +1123,21 @@
     </p>
   </div>
 
-  <div class="page-nav-row">
-    <button type="button" class="continue-btn" id="continueBtn">Continuar para Encerramento →</button>
+  <!-- Fechamento (fica na página 1: aqui é onde a proposta é enviada) -->
+  <div class="section-wrap" id="sec-fecho">
+    <div class="card section-title" style="background:var(--surface-muted); color:var(--text); border:1px solid var(--border); box-shadow:none;">
+      <div><h2 style="color:var(--text);">Fechamento</h2><p style="color:var(--text-muted);">Última etapa antes de enviar a proposta.</p></div>
+    </div>
+    <div class="card final-card">
+      <div class="q" style="padding-bottom:4px;">
+        <div class="q-head"><span class="q-title">Adicione mais dados, se pertinente</span></div>
+        <textarea data-field="dadosAdicionais" placeholder="Opcional"></textarea>
+      </div>
+      <div class="submit-row">
+        <span class="submit-status" id="submitStatus"></span>
+        <button type="submit" class="submit-btn">Enviar</button>
+      </div>
+    </div>
   </div>
 
   </div><!-- /#page1 -->
@@ -1087,43 +1146,18 @@
   <div class="page-back-row">
     <button type="button" class="back-btn" id="backBtn">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Voltar e revisar
+      Voltar ao formulário
     </button>
   </div>
 
   <!-- Closing section -->
   <div class="section-wrap" id="sec-fim">
     <div class="card section-title" style="background:var(--surface-muted); color:var(--text); border:1px solid var(--border); box-shadow:none;">
-      <div><h2 style="color:var(--text);">Encerramento (mantido)</h2><p style="color:var(--text-muted);">Perguntas 17–19 do formulário original, sem alteração — ficam sempre visíveis, independente do Escopo marcado.</p></div>
+      <div><h2 style="color:var(--text);">Encerramento</h2><p style="color:var(--text-muted);">Sua proposta foi enviada.</p></div>
     </div>
     <div class="card final-card">
-      <div class="q">
-        <div class="q-head"><span class="q-num">17</span><span class="q-title">Fotos do Reciclável</span></div>
-        <div class="q-desc">Registro geral do material/local — além das fotos por item já coletadas dentro de cada Bloco Resíduo.</div>
-        <span class="upload-btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
-          Carregar arquivo
-        </span>
-        <div class="hint">Até 10 arquivos · 100MB cada</div>
-      </div>
-      <div class="q">
-        <div class="q-head"><span class="q-num">18</span><span class="q-title">Adicione mais documentos, se pertinente</span></div>
-        <span class="upload-btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
-          Carregar arquivo
-        </span>
-        <div class="hint">Até 1 arquivo · 10MB</div>
-      </div>
-      <div class="q" style="padding-bottom:4px;">
-        <div class="q-head"><span class="q-num">19</span><span class="q-title">Adicione mais dados, se pertinente</span></div>
-        <textarea data-field="dadosAdicionais" placeholder="Opcional"></textarea>
-      </div>
-      <div class="submit-row">
-        <span class="submit-status" id="submitStatus"></span>
-        <button type="submit" class="submit-btn">Enviar</button>
-      </div>
-      <div class="after-submit" id="afterSubmit" hidden>
-        <p id="afterSubmitMsg">Resposta registrada. O download do Excel desta proposta no formato do DO já foi iniciado — se não abrir sozinho, use o botão abaixo:</p>
+      <div class="after-submit" id="afterSubmit">
+        <p id="afterSubmitMsg">Você será acionado pelas equipes comercial, de propostas e de precificação para dar continuidade à proposta e às eventuais validações necessárias.</p>
         <button type="button" class="download-btn" id="downloadXlsxBtn">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>
           Baixar Excel (.xlsx)
@@ -1161,7 +1195,6 @@
     window.scrollTo({top:0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
     agendarSalvar();
   }
-  document.getElementById('continueBtn').addEventListener('click', goToPage2);
   document.getElementById('backBtn').addEventListener('click', goToPage1);
   document.getElementById('navEncerramento').addEventListener('click', function(e){ e.preventDefault(); goToPage2(); });
 
@@ -1360,6 +1393,7 @@
       });
     });
     wirePhotoInput(root);
+    wireDocInput(root);
   }
 
   // ================= fotos dos resíduos (anexo real, embutido no Excel) =================
@@ -1395,6 +1429,59 @@
       });
     });
   }
+
+  // ================= documentos do resíduo (contratos, laudos, fichas técnicas...) =================
+  var docStore = new WeakMap();
+  var MAX_DOCS = 5;
+  var MAX_DOC_BYTES = 10 * 1024 * 1024;
+  function wireDocInput(root){
+    var input = root.querySelector('input[type="file"][data-field="documentos"]');
+    var listEl = root.querySelector('[data-role="docList"]');
+    if(!input) return;
+    input.addEventListener('change', function(){
+      var all = Array.prototype.slice.call(input.files || []);
+      var tooBig = all.filter(function(f){ return f.size > MAX_DOC_BYTES; });
+      var files = all.filter(function(f){ return f.size <= MAX_DOC_BYTES; }).slice(0, MAX_DOCS);
+      if(listEl) listEl.textContent = 'Lendo ' + files.length + ' arquivo(s)…';
+      var readers = files.map(function(f){
+        return new Promise(function(resolve){
+          var reader = new FileReader();
+          reader.onload = function(){ resolve({ name: f.name, type: f.type, dataUrl: reader.result }); };
+          reader.onerror = function(){ resolve(null); };
+          reader.readAsDataURL(f);
+        });
+      });
+      Promise.all(readers).then(function(results){
+        var docs = results.filter(Boolean);
+        docStore.set(root, docs);
+        if(!listEl) return;
+        if(!docs.length && !tooBig.length){ listEl.textContent = ''; return; }
+        var msg = docs.length ? ('Anexados: ' + docs.map(function(d){ return d.name; }).join(', ')) : '';
+        if(all.length > MAX_DOCS) msg += (msg?' · ':'') + 'apenas os primeiros ' + MAX_DOCS + ' foram mantidos.';
+        if(tooBig.length) msg += (msg?' · ':'') + tooBig.length + ' arquivo(s) acima de 10MB foram ignorados.';
+        listEl.textContent = msg;
+      });
+    });
+  }
+
+  // ================= valorização x destinação: limpa o ramo que não está em uso =================
+  // Evita que um valor de preço digitado num ramo (ex.: valorização) continue
+  // "escondido" e seja exportado depois de o usuário trocar para o outro ramo.
+  document.getElementById('blocksContainer').addEventListener('change', function(e){
+    var el = e.target;
+    if(restaurando || !el.name || el.type !== 'radio' || el.name.indexOf('condcom-') !== 0) return;
+    var block = el.closest('.residuo-block');
+    if(!block) return;
+    if(el.value === 'valorizacao'){
+      ['nomeDestinador','custoDestinador','cidadeDestinador','taxaMinima'].forEach(function(k){
+        var f = block.querySelector('[data-field="'+k+'"]'); if(f) f.value = '';
+      });
+      var tecSel = block.querySelector('[data-field="tecnologia"]'); if(tecSel) tecSel.selectedIndex = 0;
+      var destNao = block.querySelector('input[name^="dest-"][value="nao"]'); if(destNao) destNao.checked = true;
+    } else if(el.value === 'destinacao'){
+      var precoField = block.querySelector('[data-field="preco"]'); if(precoField) precoField.value = '';
+    }
+  });
   document.querySelectorAll('.residuo-block, .mo-block, .eq-block').forEach(wireConditionals);
 
   // CNPJ: aceita somente números
@@ -1491,6 +1578,14 @@
 
   // ================= data collection =================
   function val(root, sel){ var el = root.querySelector(sel); if(!el) return ''; return (el.value == null ? '' : String(el.value)).trim(); }
+  // campos de preço: o "R$"/"-R$" já é mostrado como prefixo fixo no campo (não
+  // digitado pelo usuário), então recompomos aqui para o valor exportado sair
+  // com a moeda igual como já saía antes.
+  function priceVal(root, sel, negative){
+    var v = val(root, sel);
+    if(!v) return '';
+    return (negative ? '-R$ ' : 'R$ ') + v;
+  }
   function selText(root, sel){ var el = root.querySelector(sel); if(!el) return ''; var opt = el.options[el.selectedIndex]; return opt ? opt.text : ''; }
   function radioCheckedText(root, namePrefix){
     var el = root.querySelector('input[name^="'+namePrefix+'"]:checked');
@@ -1548,7 +1643,7 @@
         periculosidade: radioCheckedText(b,'mo-peric-'),
         refeicao: radioCheckedText(b,'mo-ref-'),
         transporteFretado: radioCheckedText(b,'mo-transp-'),
-        salario: val(b,'[data-field="salario"]'),
+        salario: priceVal(b,'[data-field="salario"]'),
         atribuicoes: val(b,'[data-field="atribuicoes"]'),
         adicionalNoturno: radioCheckedText(b,'mo-noturno-'),
       });
@@ -1569,7 +1664,7 @@
         qtd: val(b,'[data-field="qtd"]'),
         escopo: radioCheckedText(b,'eq-escopo-'),
         empresaTerceiro: val(b,'[data-field="empresaTerceiro"]'),
-        precoTerceiro: val(b,'[data-field="precoTerceiro"]'),
+        precoTerceiro: priceVal(b,'[data-field="precoTerceiro"]'),
         observacoes: val(b,'[data-field="observacoes"]'),
       });
     });
@@ -1598,7 +1693,7 @@
       }
       var transpEhTerceiroOuNovo = !!(transpGate && (transpGate.value === 'terceiro' || transpGate.value === 'novo'));
       var nomeTransportador = transpEhTerceiroOuNovo ? val(b,'[data-field="empresaTerceira"]') : '';
-      var precoViagemTerceiro = transpEhTerceiroOuNovo ? val(b,'[data-field="precoViagemTerceiro"]') : '';
+      var precoViagemTerceiro = transpEhTerceiroOuNovo ? priceVal(b,'[data-field="precoViagemTerceiro"]') : '';
       var empresaTransporte = transpEhTerceiroOuNovo ? nomeTransportador : transpLabel;
       var transportador = '';
       if(transpGate){
@@ -1616,25 +1711,27 @@
         equipamentoTransporte: equipTransporte,
         veiculo: selText(b,'[data-field="veiculo"]'),
         viagens: val(b,'[data-field="viagens"]'),
+        pesoViagem: val(b,'[data-field="pesoViagem"]'),
         transportador: transportador,
         empresaTransporte: empresaTransporte,
         precoViagemTerceiro: precoViagemTerceiro,
+        condComercial: radioCheckedText(b,'condcom-'),
         cidadeDestino: temDestinador ? val(b,'[data-field="cidadeDestinador"]') : '',
         tecnologia: temDestinador ? selText(b,'[data-field="tecnologia"]') : '',
         nomeDestinador: val(b,'[data-field="nomeDestinador"]'),
-        custoDestinador: val(b,'[data-field="custoDestinador"]'),
-        preco: val(b,'[data-field="preco"]'),
+        custoDestinador: priceVal(b,'[data-field="custoDestinador"]'),
+        preco: priceVal(b,'[data-field="preco"]', true),
         taxaMinima: val(b,'[data-field="taxaMinima"]'),
         laudo: (tipo === 'Sucata metálica') ? radioCheckedText(b,'laudo-') : '',
         fotos: photoStore.get(b) || [],
+        documentos: docStore.get(b) || [],
       });
     });
     return out;
   }
 
   function getEncerramento(){
-    var root = document.getElementById('sec-fim');
-    return { dadosAdicionais: val(root,'[data-field="dadosAdicionais"]') };
+    return { dadosAdicionais: val(document,'[data-field="dadosAdicionais"]') };
   }
 
   function buildPayload(){
@@ -1814,7 +1911,7 @@
       var destinador = r.nomeDestinador || '';
       if(destinador && r.cidadeDestino) destinador += ' — ' + r.cidadeDestino;
       else if(!destinador && r.cidadeDestino) destinador = r.cidadeDestino;
-      return ['', r.tipo, '', '', r.acondicionamento, '', '', '', r.veiculo, r.geracao, r.unidade, r.transportador || '', r.tecnologia, destinador, r.precoViagemTerceiro || '', r.custoDestinador || '', '', r.viagens || '', '', '', ''];
+      return ['', r.tipo, '', '', r.acondicionamento, '', '', '', r.veiculo, r.geracao, r.unidade, r.transportador || '', r.tecnologia, destinador, r.precoViagemTerceiro || '', r.custoDestinador || '', r.pesoViagem || '', r.viagens || '', '', '', ''];
     });
     var wsDo = wb.addWorksheet('DO');
     wsDo.addRows([doTitle, doHead].concat(doRows));
@@ -1944,6 +2041,7 @@
 
   form.addEventListener('submit', async function(ev){
     ev.preventDefault();
+    if(!mainFormEl.reportValidity()) return;
     var payload = buildPayload();
     lastPayload = payload;
     statusEl.textContent = 'Salvando…';
@@ -1963,8 +2061,9 @@
       statusEl.textContent = 'Salvamento indisponível neste visualizador — mas o Excel já foi gerado com o que você preencheu.';
     }
 
-    afterSubmit.hidden = false;
-    afterSubmit.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block:'center'});
+    page1.hidden = true;
+    page2.hidden = false;
+    window.scrollTo({top:0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'});
 
     // Resposta já enviada — o rascunho salvo localmente não faz mais sentido.
     apagarRascunho();
@@ -2130,16 +2229,20 @@
   function fotoListText(fotos){
     return fotos && fotos.length ? ('Anexadas: ' + fotos.map(function(p){ return p.name; }).join(', ')) : '';
   }
+  function docListText(docs){
+    return docs && docs.length ? ('Anexados: ' + docs.map(function(d){ return d.name; }).join(', ')) : '';
+  }
 
   // ---- fotografa o estado inteiro do formulário ----
   function fotografarEstado(){
-    var blocks = {}, counts = {}, photos = {};
+    var blocks = {}, counts = {}, photos = {}, docs = {};
     REPEATABLE_DEFS.forEach(function(def){
       var els = Array.prototype.slice.call(document.querySelectorAll('#'+def.containerId+' .'+def.blockClass));
       counts[def.addKey] = els.length;
       blocks[def.addKey] = els.map(serializeBlock);
       if(def.addKey === 'residuo'){
         photos[def.addKey] = els.map(function(b){ return photoStore.get(b) || []; });
+        docs[def.addKey] = els.map(function(b){ return docStore.get(b) || []; });
       }
     });
     var scope = {};
@@ -2152,6 +2255,7 @@
       counts: counts,
       blocks: blocks,
       photos: photos,
+      docs: docs,
       page: page2.hidden ? 'page1' : 'page2',
       salvoEm: new Date().toISOString()
     };
@@ -2221,6 +2325,15 @@
               if(listEl) listEl.textContent = fotoListText(fotos);
             }
           });
+          var docList = (registro.docs && registro.docs[def.addKey]) || [];
+          els.forEach(function(b, i){
+            var docs = docList[i] || [];
+            if(docs.length){
+              docStore.set(b, docs);
+              var listEl = b.querySelector('[data-role="docList"]');
+              if(listEl) listEl.textContent = docListText(docs);
+            }
+          });
         }
       });
 
@@ -2259,9 +2372,12 @@
       var blocks = Array.prototype.slice.call(container.querySelectorAll('.'+def.blockClass));
       blocks.forEach(function(b, i){
         photoStore.delete(b);
+        docStore.delete(b);
         if(i === 0){
           var listEl = b.querySelector('[data-role="photoList"]');
           if(listEl) listEl.textContent = '';
+          var docListEl = b.querySelector('[data-role="docList"]');
+          if(docListEl) docListEl.textContent = '';
         } else {
           b.remove();
         }
@@ -2276,7 +2392,6 @@
     document.querySelectorAll('.scope-toggle').forEach(function(cb){ cb.dispatchEvent(new Event('change', {bubbles:true})); });
 
     lastPayload = null;
-    if(afterSubmit) afterSubmit.hidden = true;
     if(statusEl) statusEl.textContent = '';
     if(workbookDlStatus) workbookDlStatus.textContent = '';
     page2.hidden = true;
