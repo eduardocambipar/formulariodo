@@ -199,6 +199,21 @@
   .dl-status.dl-error{color:#B3261E;}
   @media (prefers-color-scheme: dark){ .dl-status.dl-error{color:#FF8A73;} }
 
+  .dl-status:has(.file-chip){display:flex; flex-wrap:wrap; gap:6px; align-items:center; max-width:none;}
+  .file-chip{
+    display:inline-flex; align-items:center; gap:6px; background:var(--surface-muted);
+    border:1px solid var(--border-strong); border-radius:999px; padding:4px 6px 4px 12px;
+    font-size:12.5px; color:var(--text); max-width:100%;
+  }
+  .file-chip-name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:28ch;}
+  .file-chip-remove{
+    display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px;
+    border-radius:50%; border:none; background:transparent; color:var(--text-faint);
+    font-size:11px; line-height:1; cursor:pointer; flex:none;
+  }
+  .file-chip-remove:hover{background:var(--required); color:#fff;}
+  .file-warn{flex-basis:100%; font-size:12px; color:var(--text-faint); margin-top:2px;}
+
   /* ---------- history panel ---------- */
   .history-panel{
     background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-card);
@@ -548,8 +563,8 @@
       </div>
       <div class="q" style="padding-bottom:2px;">
         <div class="q-head"><span class="q-num">4</span><span class="q-title">CNPJ <span class="req">*</span></span></div>
-        <div class="q-desc">Somente números, sem pontos, barra ou traço.</div>
-        <input type="text" data-field="cnpj" inputmode="numeric" pattern="[0-9]*" placeholder="00000000000000" required>
+        <div class="q-desc">Digite só os números — os pontos, a barra e o traço são adicionados automaticamente.</div>
+        <input type="text" data-field="cnpj" inputmode="numeric" maxlength="18" placeholder="00.000.000/0000-00" required>
       </div>
     </div>
 
@@ -560,12 +575,15 @@
       <div class="q">
         <div class="q-head"><span class="q-num">5</span><span class="q-title">Contrato <span class="req">*</span></span></div>
         <div class="choices">
-          <div class="choice"><input type="radio" name="contrato" id="ct-1" checked required><label for="ct-1">Novo Contrato</label></div>
-          <div class="choice"><input type="radio" name="contrato" id="ct-2"><label for="ct-2">Renovação</label></div>
-          <div class="choice"><input type="radio" name="contrato" id="ct-3"><label for="ct-3">Reajuste</label></div>
-          <div class="choice"><input type="radio" name="contrato" id="ct-4"><label for="ct-4">Aditivo</label></div>
-          <div class="choice"><input type="radio" name="contrato" id="ct-5"><label for="ct-5">SPOT</label></div>
-          <div class="choice"><input type="radio" name="contrato" id="ct-6"><label for="ct-6">Outra</label></div>
+          <div class="choice"><input type="radio" name="contrato" data-gate="contrato" id="ct-1" checked required><label for="ct-1">Novo Contrato</label></div>
+          <div class="choice"><input type="radio" name="contrato" data-gate="contrato" id="ct-2"><label for="ct-2">Renovação</label></div>
+          <div class="choice"><input type="radio" name="contrato" data-gate="contrato" id="ct-3"><label for="ct-3">Reajuste</label></div>
+          <div class="choice"><input type="radio" name="contrato" data-gate="contrato" id="ct-4"><label for="ct-4">Aditivo</label></div>
+          <div class="choice"><input type="radio" name="contrato" data-gate="contrato" id="ct-5"><label for="ct-5">SPOT</label></div>
+          <div class="choice"><input type="radio" name="contrato" data-gate="contrato" value="outra" id="ct-6"><label for="ct-6">Outra (especificar)</label></div>
+        </div>
+        <div class="cond" data-cond-for="contrato" data-show-when="outra">
+          <input type="text" data-field="contratoOutro" placeholder="Descreva o tipo de contrato">
         </div>
       </div>
       <div class="q">
@@ -649,15 +667,18 @@
             <div>
               <div class="q-head"><span class="q-num">MO3</span><span class="q-title">Jornada de trabalho <span class="req">*</span></span></div>
               <div class="map-tag">→ coluna F · Jornada de Trabalho</div>
-              <select data-field="jornada">
+              <select class="f-mo-jornada" data-gate="mo-jornada-1" data-field="jornada">
                 <option selected>ADM (44h/semana)</option>
                 <option>12x36</option>
                 <option>6x1</option>
                 <option>Turno único</option>
                 <option>2 turnos</option>
                 <option>3 turnos (24h)</option>
-                <option>Outra</option>
+                <option value="outro">Outra (especificar)</option>
               </select>
+              <div class="cond" data-cond-for="mo-jornada-1" data-show-when="outro">
+                <input type="text" data-field="jornadaOutro" placeholder="Descreva a jornada">
+              </div>
             </div>
           </div>
         </div>
@@ -906,7 +927,7 @@
         <div class="q">
           <div class="q-head"><span class="q-num">R4</span><span class="cat-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Destinação</span><span class="q-title">Acondicionamento atual (ou desejado) <span class="req">*</span></span></div>
           <div class="map-tag">→ aba DO, coluna E · Acondicionamento</div>
-          <select data-field="acondicionamento">
+          <select class="f-acond" data-gate="acond-1" data-field="acondicionamento">
             <option>À granel</option>
             <option>Bombona plástica de 200 lts</option>
             <option>Container metálico de 1,2 m³</option>
@@ -919,8 +940,11 @@
             <option>Caçamba brooks aberta</option>
             <option>Caçamba brooks fechada c/ tampa</option>
             <option>Compactador estacionário</option>
-            <option>Outro</option>
+            <option value="outro">Outro (especificar)</option>
           </select>
+          <div class="cond" data-cond-for="acond-1" data-show-when="outro">
+            <input type="text" data-field="acondicionamentoOutro" placeholder="Descreva o acondicionamento">
+          </div>
         </div>
 
         <div class="q">
@@ -951,7 +975,7 @@
         <div class="q">
           <div class="q-head"><span class="q-num">R7</span><span class="cat-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 17h13V6H3zM16 10h3l3 3v4h-6zM7.5 20.5a2 2 0 100-4 2 2 0 000 4zM17.5 20.5a2 2 0 100-4 2 2 0 000 4z"/></svg>Transporte</span><span class="q-title">Qual veículo faz (ou fará) a coleta? <span class="req">*</span></span></div>
           <div class="map-tag">→ aba DO, coluna I · Veículo utilizado</div>
-          <select data-field="veiculo">
+          <select class="f-veiculo" data-gate="veiculo-1" data-field="veiculo">
             <option>Caminhão poliguindaste</option>
             <option>Caminhão basculante</option>
             <option>Caminhão baú (10 paletes)</option>
@@ -964,8 +988,11 @@
             <option>Fiorino (2 paletes)</option>
             <option>VLC (6 paletes)</option>
             <option>VUC (4 paletes)</option>
-            <option>Não sei / Outro</option>
+            <option value="outro">Não sei / Outro (especificar)</option>
           </select>
+          <div class="cond" data-cond-for="veiculo-1" data-show-when="outro">
+            <input type="text" data-field="veiculoOutro" placeholder="Descreva o veículo, se souber">
+          </div>
         </div>
 
         <div class="q">
@@ -975,7 +1002,10 @@
             <div class="choice"><input type="radio" name="transp-1" data-gate="transp-1" value="ambipar" id="tr1-1" checked><label for="tr1-1">Já é feito pela Ambipar</label></div>
             <div class="choice"><input type="radio" name="transp-1" data-gate="transp-1" value="terceiro" id="tr1-2"><label for="tr1-2">Feito por empresa terceira</label></div>
             <div class="choice"><input type="radio" name="transp-1" data-gate="transp-1" value="novo" id="tr1-3"><label for="tr1-3">Não há transporte hoje (novo)</label></div>
-            <div class="choice"><input type="radio" name="transp-1" data-gate="transp-1" value="outra" id="tr1-4"><label for="tr1-4">Outra</label></div>
+            <div class="choice"><input type="radio" name="transp-1" data-gate="transp-1" value="outra" id="tr1-4"><label for="tr1-4">Outra (especificar)</label></div>
+          </div>
+          <div class="cond" data-cond-for="transp-1" data-show-when="outra">
+            <input type="text" data-field="transporteOutro" placeholder="Descreva a situação do transporte">
           </div>
           <div class="cond" data-cond-for="transp-1" data-show-when="terceiro,novo">
             <div class="q" style="padding-top:2px;">
@@ -1033,25 +1063,26 @@
               <div class="map-tag">→ aba DO, coluna R · Custo/destinação</div>
               <div class="price-field"><span class="price-prefix">R$</span><input type="text" data-field="custoDestinador" placeholder='Ex.: "25/ton"'></div>
             </div>
+            <div class="q" style="padding-bottom:0;">
+              <div class="q-head"><span class="q-num">R16</span><span class="q-title">Tratamento/tecnologia de destinação <span class="req">*</span></span></div>
+              <div class="map-tag">→ aba DO, coluna O · Tratamento</div>
+              <select data-field="tecnologia" data-required-when-shown>
+                <option value="">Selecione…</option>
+                <option>Reciclagem</option>
+                <option>Aterro classe I</option>
+                <option>Aterro classe II</option>
+                <option>Compostagem</option>
+                <option>Coprocessamento</option>
+                <option>Valorização energética</option>
+                <option>Descaracterização</option>
+                <option>Não sei</option>
+              </select>
+            </div>
             <div class="cond" data-cond-for="dest-1" data-show-when="sim">
-              <div class="q">
-                <div class="q-head"><span class="q-num">R16</span><span class="q-title">Cidade/UF do destinador</span></div>
+              <div class="q" style="padding-bottom:0;">
+                <div class="q-head"><span class="q-num">R17</span><span class="q-title">Cidade/UF do destinador</span></div>
                 <div class="map-tag">→ aba DO, coluna P (junto do nome do destinador)</div>
                 <input type="text" data-field="cidadeDestinador" placeholder="Ex.: Serra/ES">
-              </div>
-              <div class="q" style="padding-bottom:0;">
-                <div class="q-head"><span class="q-num">R17</span><span class="q-title">Tecnologia de destinação, se souber</span></div>
-                <div class="map-tag">→ aba DO, coluna O · Tratamento</div>
-                <select data-field="tecnologia">
-                  <option>Reciclagem</option>
-                  <option>Aterro classe I</option>
-                  <option>Aterro classe II</option>
-                  <option>Compostagem</option>
-                  <option>Coprocessamento</option>
-                  <option>Valorização energética</option>
-                  <option>Descaracterização</option>
-                  <option>Não sei</option>
-                </select>
               </div>
             </div>
             <div class="q" style="padding-bottom:0;">
@@ -1065,7 +1096,7 @@
             <div class="q" style="padding-bottom:0;">
               <div class="q-head"><span class="q-num">R19</span><span class="q-title">Valor pago pela Ambipar/cliente por este resíduo</span></div>
               <div class="q-desc">Já sai em valor negativo — é uma receita/desconto, não um custo.</div>
-              <div class="map-tag">→ apoio (aba Dados de Apoio)</div>
+              <div class="map-tag">→ aba DO, coluna R · Custo/Destinação (mesma coluna, valor negativo)</div>
               <div class="price-field"><span class="price-prefix neg">-R$</span><input type="text" data-field="preco" placeholder='Ex.: "180/ton"'></div>
             </div>
           </div>
@@ -1132,6 +1163,17 @@
       <div class="q" style="padding-bottom:4px;">
         <div class="q-head"><span class="q-title">Adicione mais dados, se pertinente</span></div>
         <textarea data-field="dadosAdicionais" placeholder="Opcional"></textarea>
+      </div>
+      <div class="q" style="padding-bottom:2px;">
+        <div class="q-head"><span class="q-title">Arquivos gerais da proposta, se pertinente</span></div>
+        <div class="q-desc">Documentos que não são de um resíduo específico — apresentação, planta do local, contrato-modelo etc.</div>
+        <label class="upload-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3"/></svg>
+          Carregar arquivo
+          <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,image/jpeg,image/png" multiple data-field="arquivosGerais" style="position:absolute; width:1px; height:1px; opacity:0; overflow:hidden;">
+        </label>
+        <div class="hint">Até 10 arquivos · 10MB cada · PDF, Word, Excel ou imagem</div>
+        <div class="dl-status" data-role="arqGeraisList"></div>
       </div>
       <div class="submit-row">
         <span class="submit-status" id="submitStatus"></span>
@@ -1377,6 +1419,14 @@
   }
 
   // ================= generic conditional wiring: data-gate / data-cond-for =================
+  // Campos marcados com data-required-when-shown só devem bloquear o envio enquanto a
+  // condição que os revela estiver realmente visível — do contrário um campo escondido
+  // (ex.: Tratamento, só faz sentido para Destinação) travaria o formulário sem o usuário
+  // conseguir ver ou corrigir o que falta.
+  function syncRequiredForTarget(target){
+    var shouldShow = target.classList.contains('show');
+    target.querySelectorAll('[data-required-when-shown]').forEach(function(f){ f.required = shouldShow; });
+  }
   function wireConditionals(root){
     root.querySelectorAll('[data-gate]').forEach(function(input){
       input.addEventListener('change', function(){
@@ -1389,27 +1439,88 @@
         targets.forEach(function(target){
           var showVals = (target.getAttribute('data-show-when')||'').split(',');
           target.classList.toggle('show', showVals.indexOf(val) > -1);
+          syncRequiredForTarget(target);
         });
       });
     });
+    // sincroniza o estado inicial (página recém-carregada ou bloco recém-clonado), já que
+    // o passo acima só roda a partir de um 'change' do usuário.
+    root.querySelectorAll('[data-cond-for]').forEach(syncRequiredForTarget);
     wirePhotoInput(root);
     wireDocInput(root);
   }
 
-  // ================= fotos dos resíduos (anexo real, embutido no Excel) =================
-  var photoStore = new WeakMap();
-  var MAX_PHOTOS = 10;
-  var MAX_PHOTO_BYTES = 5 * 1024 * 1024;
-  function wirePhotoInput(root){
-    var input = root.querySelector('input[type="file"][data-field="fotos"]');
-    var listEl = root.querySelector('[data-role="photoList"]');
+  // ================= upload genérico de arquivos (fotos, documentos, anexos gerais) =================
+  // Um único mecanismo cobre os três campos de upload do formulário: guarda os arquivos lidos
+  // num WeakMap por "root" (o bloco de resíduo, ou o próprio documento no caso dos anexos
+  // gerais), mostra a lista como "chips" com botão de remover individual, e FUNDE novas
+  // seleções com as já existentes — um <input type="file"> substitui a FileList inteira a
+  // cada seleção, então sem essa fusão, escolher mais arquivos depois apagaria os anteriores.
+  function renderFileChips(listEl, items, onRemove, warningText){
+    if(!listEl) return;
+    listEl.textContent = '';
+    (items||[]).forEach(function(item, idx){
+      var chip = document.createElement('span');
+      chip.className = 'file-chip';
+      var name = document.createElement('span');
+      name.className = 'file-chip-name';
+      name.textContent = item.name;
+      chip.appendChild(name);
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'file-chip-remove';
+      rm.setAttribute('aria-label', 'Remover ' + item.name);
+      rm.textContent = '✕';
+      rm.addEventListener('click', function(){ onRemove(idx); });
+      chip.appendChild(rm);
+      listEl.appendChild(chip);
+    });
+    if(warningText){
+      var warn = document.createElement('div');
+      warn.className = 'file-warn';
+      warn.textContent = warningText;
+      listEl.appendChild(warn);
+    }
+  }
+
+  function setFileListAndRender(root, store, listEl, items, warningText){
+    store.set(root, items);
+    renderFileChips(listEl, items, function(idx){
+      var updated = (store.get(root) || []).slice();
+      updated.splice(idx, 1);
+      setFileListAndRender(root, store, listEl, updated);
+      agendarSalvar();
+    }, warningText);
+  }
+
+  function wireFileInput(root, opts){
+    var input = root.querySelector(opts.fieldSelector);
+    var listEl = root.querySelector(opts.listSelector);
     if(!input) return;
     input.addEventListener('change', function(){
-      var all = Array.prototype.slice.call(input.files || []);
-      var tooBig = all.filter(function(f){ return f.size > MAX_PHOTO_BYTES; });
-      var files = all.filter(function(f){ return f.size <= MAX_PHOTO_BYTES; }).slice(0, MAX_PHOTOS);
-      if(listEl) listEl.textContent = 'Lendo ' + files.length + ' arquivo(s)…';
-      var readers = files.map(function(f){
+      var incoming = Array.prototype.slice.call(input.files || []);
+      input.value = ''; // libera o campo para permitir escolher o mesmo arquivo de novo depois
+      if(!incoming.length) return;
+      var existing = (opts.store.get(root) || []).slice();
+      var tooBig = incoming.filter(function(f){ return f.size > opts.maxBytes; });
+      var validos = incoming.filter(function(f){ return f.size <= opts.maxBytes; });
+      var espacoLivre = Math.max(0, opts.maxCount - existing.length);
+      var aceitos = validos.slice(0, espacoLivre);
+      var descartadosPorLimite = validos.length - aceitos.length;
+      var avisoPartes = [];
+      if(descartadosPorLimite > 0) avisoPartes.push(descartadosPorLimite + ' arquivo(s) não coube(ram) no limite de ' + opts.maxCount + '.');
+      if(tooBig.length) avisoPartes.push(tooBig.length + ' arquivo(s) acima de ' + Math.round(opts.maxBytes/1024/1024) + 'MB foram ignorados.');
+      var aviso = avisoPartes.join(' ');
+      if(!aceitos.length){
+        if(aviso) renderFileChips(listEl, existing, function(idx){
+          var updated = existing.slice(); updated.splice(idx,1);
+          setFileListAndRender(root, opts.store, listEl, updated);
+          agendarSalvar();
+        }, aviso);
+        return;
+      }
+      if(listEl) listEl.textContent = 'Lendo ' + aceitos.length + ' arquivo(s)…';
+      var readers = aceitos.map(function(f){
         return new Promise(function(resolve){
           var reader = new FileReader();
           reader.onload = function(){ resolve({ name: f.name, type: f.type, dataUrl: reader.result }); };
@@ -1418,51 +1529,57 @@
         });
       });
       Promise.all(readers).then(function(results){
-        var photos = results.filter(Boolean);
-        photoStore.set(root, photos);
-        if(!listEl) return;
-        if(!photos.length && !tooBig.length){ listEl.textContent = ''; return; }
-        var msg = photos.length ? ('Anexadas: ' + photos.map(function(p){ return p.name; }).join(', ')) : '';
-        if(all.length > MAX_PHOTOS) msg += (msg?' · ':'') + 'apenas as primeiras ' + MAX_PHOTOS + ' foram mantidas.';
-        if(tooBig.length) msg += (msg?' · ':'') + tooBig.length + ' arquivo(s) acima de 5MB foram ignorados.';
-        listEl.textContent = msg;
+        var novos = results.filter(Boolean);
+        var combinados = existing.concat(novos);
+        setFileListAndRender(root, opts.store, listEl, combinados, aviso);
+        agendarSalvar();
       });
     });
   }
 
-  // ================= documentos do resíduo (contratos, laudos, fichas técnicas...) =================
+  // ---- fotos do resíduo (anexo real, embutido no Excel) ----
+  var photoStore = new WeakMap();
+  var MAX_PHOTOS = 10;
+  var MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+  function wirePhotoInput(root){
+    wireFileInput(root, {
+      fieldSelector: 'input[type="file"][data-field="fotos"]',
+      listSelector: '[data-role="photoList"]',
+      store: photoStore,
+      maxCount: MAX_PHOTOS,
+      maxBytes: MAX_PHOTO_BYTES,
+    });
+  }
+
+  // ---- documentos do resíduo (contratos, laudos, fichas técnicas...) ----
   var docStore = new WeakMap();
   var MAX_DOCS = 5;
   var MAX_DOC_BYTES = 10 * 1024 * 1024;
   function wireDocInput(root){
-    var input = root.querySelector('input[type="file"][data-field="documentos"]');
-    var listEl = root.querySelector('[data-role="docList"]');
-    if(!input) return;
-    input.addEventListener('change', function(){
-      var all = Array.prototype.slice.call(input.files || []);
-      var tooBig = all.filter(function(f){ return f.size > MAX_DOC_BYTES; });
-      var files = all.filter(function(f){ return f.size <= MAX_DOC_BYTES; }).slice(0, MAX_DOCS);
-      if(listEl) listEl.textContent = 'Lendo ' + files.length + ' arquivo(s)…';
-      var readers = files.map(function(f){
-        return new Promise(function(resolve){
-          var reader = new FileReader();
-          reader.onload = function(){ resolve({ name: f.name, type: f.type, dataUrl: reader.result }); };
-          reader.onerror = function(){ resolve(null); };
-          reader.readAsDataURL(f);
-        });
-      });
-      Promise.all(readers).then(function(results){
-        var docs = results.filter(Boolean);
-        docStore.set(root, docs);
-        if(!listEl) return;
-        if(!docs.length && !tooBig.length){ listEl.textContent = ''; return; }
-        var msg = docs.length ? ('Anexados: ' + docs.map(function(d){ return d.name; }).join(', ')) : '';
-        if(all.length > MAX_DOCS) msg += (msg?' · ':'') + 'apenas os primeiros ' + MAX_DOCS + ' foram mantidos.';
-        if(tooBig.length) msg += (msg?' · ':'') + tooBig.length + ' arquivo(s) acima de 10MB foram ignorados.';
-        listEl.textContent = msg;
-      });
+    wireFileInput(root, {
+      fieldSelector: 'input[type="file"][data-field="documentos"]',
+      listSelector: '[data-role="docList"]',
+      store: docStore,
+      maxCount: MAX_DOCS,
+      maxBytes: MAX_DOC_BYTES,
     });
   }
+
+  // ---- anexos gerais (não ligados a um resíduo específico) ----
+  var arqGeraisStore = new WeakMap();
+  var arqGeraisRoot = document; // chave fixa: não há repetição deste campo
+  var MAX_ARQ_GERAIS = 10;
+  var MAX_ARQ_GERAIS_BYTES = 10 * 1024 * 1024;
+  function wireArqGeraisInput(){
+    wireFileInput(arqGeraisRoot, {
+      fieldSelector: 'input[type="file"][data-field="arquivosGerais"]',
+      listSelector: '[data-role="arqGeraisList"]',
+      store: arqGeraisStore,
+      maxCount: MAX_ARQ_GERAIS,
+      maxBytes: MAX_ARQ_GERAIS_BYTES,
+    });
+  }
+  wireArqGeraisInput();
 
   // ================= valorização x destinação: limpa o ramo que não está em uso =================
   // Evita que um valor de preço digitado num ramo (ex.: valorização) continue
@@ -1483,13 +1600,23 @@
     }
   });
   document.querySelectorAll('.residuo-block, .mo-block, .eq-block').forEach(wireConditionals);
+  wireConditionals(document.getElementById('sec-cadastro'));
 
-  // CNPJ: aceita somente números
+  // CNPJ: formata automaticamente como 00.000.000/0000-00 enquanto digita
+  function formatCNPJ(digits){
+    digits = digits.slice(0, 14);
+    if(digits.length > 12) return digits.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
+    if(digits.length > 8) return digits.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+    if(digits.length > 5) return digits.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+    if(digits.length > 2) return digits.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+    return digits;
+  }
   var cnpjInput = document.querySelector('[data-field="cnpj"]');
   if(cnpjInput){
     cnpjInput.addEventListener('input', function(){
       var digits = cnpjInput.value.replace(/\D+/g, '').slice(0, 14);
-      if(digits !== cnpjInput.value) cnpjInput.value = digits;
+      var formatted = formatCNPJ(digits);
+      if(formatted !== cnpjInput.value) cnpjInput.value = formatted;
     });
   }
 
@@ -1596,12 +1723,14 @@
 
   function getCadastro(){
     var root = document.getElementById('sec-cadastro');
+    var contrato = radioCheckedText(root,'contrato');
+    if(/^Outra/.test(contrato)){ var cOutro = val(root,'[data-field="contratoOutro"]'); if(cOutro) contrato = cOutro; }
     return {
       nomeFantasia: val(root,'[data-field="nomeFantasia"]'),
       subunidade: val(root,'[data-field="subunidade"]'),
       endereco: val(root,'[data-field="endereco"]'),
-      cnpj: val(root,'[data-field="cnpj"]').replace(/\D+/g,''),
-      contrato: radioCheckedText(root,'contrato'),
+      cnpj: val(root,'[data-field="cnpj"]'),
+      contrato: contrato,
       solicitante: val(root,'[data-field="solicitante"]'),
       emailSolicitante: val(root,'[data-field="emailSolicitante"]'),
       comercial: val(root,'[data-field="comercial"]'),
@@ -1627,6 +1756,8 @@
     document.querySelectorAll('#moContainer .mo-block').forEach(function(b){
       var funcao = selText(b,'[data-field="funcao"]');
       if(/^Outra/.test(funcao)){ var o = val(b,'[data-field="funcaoOutro"]'); if(o) funcao = o; }
+      var jornada = selText(b,'[data-field="jornada"]');
+      if(/^Outra/.test(jornada)){ var jo = val(b,'[data-field="jornadaOutro"]'); if(jo) jornada = jo; }
       var insalGate = b.querySelector('input[data-gate^="mo-insal-"]:checked');
       var insal = '';
       if(insalGate){
@@ -1636,7 +1767,7 @@
       out.push({
         funcao: funcao,
         qtd: val(b,'[data-field="qtd"]'),
-        jornada: selText(b,'[data-field="jornada"]'),
+        jornada: jornada,
         horario: val(b,'[data-field="horario"]'),
         situacao: radioCheckedText(b,'mo-sit-'),
         insalubridade: insal,
@@ -1678,6 +1809,12 @@
       var tipo = selText(b,'[data-field="tipo"]');
       if(/^Outro/.test(tipo)){ var o = val(b,'[data-field="tipoOutro"]'); if(o) tipo = o; }
 
+      var acondicionamento = selText(b,'[data-field="acondicionamento"]');
+      if(/^Outro/.test(acondicionamento)){ var ao = val(b,'[data-field="acondicionamentoOutro"]'); if(ao) acondicionamento = ao; }
+
+      var veiculo = selText(b,'[data-field="veiculo"]');
+      if(/^Não sei \/ Outro/.test(veiculo)){ var vo = val(b,'[data-field="veiculoOutro"]'); if(vo) veiculo = vo; }
+
       var equipGate = b.querySelector('input[data-gate^="equip-"]:checked');
       var equipTransporte = 'Não aplicável';
       if(equipGate){
@@ -1692,6 +1829,8 @@
         transpLabel = lbl ? lbl.textContent.trim() : '';
       }
       var transpEhTerceiroOuNovo = !!(transpGate && (transpGate.value === 'terceiro' || transpGate.value === 'novo'));
+      var transpEhOutra = !!(transpGate && transpGate.value === 'outra');
+      if(transpEhOutra){ var to = val(b,'[data-field="transporteOutro"]'); if(to) transpLabel = to; }
       var nomeTransportador = transpEhTerceiroOuNovo ? val(b,'[data-field="empresaTerceira"]') : '';
       var precoViagemTerceiro = transpEhTerceiroOuNovo ? priceVal(b,'[data-field="precoViagemTerceiro"]') : '';
       var empresaTransporte = transpEhTerceiroOuNovo ? nomeTransportador : transpLabel;
@@ -1707,9 +1846,9 @@
         tipo: tipo,
         geracao: val(b,'[data-field="geracao"]'),
         unidade: radioCheckedText(b,'unidade-'),
-        acondicionamento: selText(b,'[data-field="acondicionamento"]'),
+        acondicionamento: acondicionamento,
         equipamentoTransporte: equipTransporte,
-        veiculo: selText(b,'[data-field="veiculo"]'),
+        veiculo: veiculo,
         viagens: val(b,'[data-field="viagens"]'),
         pesoViagem: val(b,'[data-field="pesoViagem"]'),
         transportador: transportador,
@@ -1717,7 +1856,7 @@
         precoViagemTerceiro: precoViagemTerceiro,
         condComercial: radioCheckedText(b,'condcom-'),
         cidadeDestino: temDestinador ? val(b,'[data-field="cidadeDestinador"]') : '',
-        tecnologia: temDestinador ? selText(b,'[data-field="tecnologia"]') : '',
+        tecnologia: selText(b,'[data-field="tecnologia"]'),
         nomeDestinador: val(b,'[data-field="nomeDestinador"]'),
         custoDestinador: priceVal(b,'[data-field="custoDestinador"]'),
         preco: priceVal(b,'[data-field="preco"]', true),
@@ -1731,7 +1870,10 @@
   }
 
   function getEncerramento(){
-    return { dadosAdicionais: val(document,'[data-field="dadosAdicionais"]') };
+    return {
+      dadosAdicionais: val(document,'[data-field="dadosAdicionais"]'),
+      arquivosGerais: arqGeraisStore.get(arqGeraisRoot) || [],
+    };
   }
 
   function buildPayload(){
@@ -1906,12 +2048,17 @@
 
     // ---------- DO (núcleo técnico — mesmas colunas do modelo, começando na B) ----------
     var doTitle = ['', 'DIMENSIONAMENTO OPERACIONAL'];
-    var doHead = ['', 'Resíduo','Classificação do Resíduo','Estado Físico','Acondicionamento','Caçamba necessária','Quantidade de caçambas','Densidade (t/m³)','Veículo utilizado','Geração Mensal (t)','Unidade de medida','Transportador','Tratamento','Destinador','Preço/viagem - TERCEIRO','Custo/destinação','Peso por Viagem (t)','Quantidade de Viagens','Tempo de Carregamento (h)','Tempo de Descarregamento (h)','Velocidade Média (km/h)'];
+    var doHead = ['', 'Resíduo','Classificação do Resíduo','Estado Físico','Acondicionamento','Caçamba necessária','Quantidade de caçambas','Densidade (t/m³)','Veículo utilizado','Geração Mensal (t)','Unidade de medida','Transportador','Tratamento','Destinador','Preço/viagem - TERCEIRO','Custo/Destinação (ou valor pago, se valorização — negativo)','Peso por Viagem (t)','Quantidade de Viagens','Tempo de Carregamento (h)','Tempo de Descarregamento (h)','Velocidade Média (km/h)'];
     var doRows = (payload.residuos||[]).map(function(r){
       var destinador = r.nomeDestinador || '';
       if(destinador && r.cidadeDestino) destinador += ' — ' + r.cidadeDestino;
       else if(!destinador && r.cidadeDestino) destinador = r.cidadeDestino;
-      return ['', r.tipo, '', '', r.acondicionamento, '', '', '', r.veiculo, r.geracao, r.unidade, r.transportador || '', r.tecnologia, destinador, r.precoViagemTerceiro || '', r.custoDestinador || '', r.pesoViagem || '', r.viagens || '', '', '', ''];
+      // Destinação (custo) e Valorização (valor recebido) são mutuamente exclusivas por
+      // resíduo — por isso dividem a mesma coluna "Custo/Destinação" na aba DO, com o
+      // valor de valorização já vindo negativo (é receita/desconto, não custo).
+      var ehValorizacao = /^Valoriza/.test(r.condComercial || '');
+      var custoOuValor = ehValorizacao ? (r.preco || '') : (r.custoDestinador || '');
+      return ['', r.tipo, '', '', r.acondicionamento, '', '', '', r.veiculo, r.geracao, r.unidade, r.transportador || '', r.tecnologia, destinador, r.precoViagemTerceiro || '', custoOuValor, r.pesoViagem || '', r.viagens || '', '', '', ''];
     });
     var wsDo = wb.addWorksheet('DO');
     wsDo.addRows([doTitle, doHead].concat(doRows));
@@ -1969,6 +2116,23 @@
       setColWidths(wsApoio, [5, 20, 24, 30, 30, 20]);
       styleHeaderRow(wsApoio, 0, apoioHead.length);
       styleDataRows(wsApoio, 1, apoioRows.length, apoioHead.length, 0);
+    }
+
+    // ---------- ANEXOS (lista de nomes — documentos por resíduo + arquivos gerais; não embutidos no Excel) ----------
+    var anexosRows = [];
+    (payload.residuos||[]).forEach(function(r, i){
+      (r.documentos||[]).forEach(function(d){ anexosRows.push(['Resíduo ' + (i+1) + ' — ' + (r.tipo||''), d.name]); });
+    });
+    (payload.encerramento && payload.encerramento.arquivosGerais || []).forEach(function(a){
+      anexosRows.push(['Geral da proposta', a.name]);
+    });
+    if(anexosRows.length){
+      var anexosHead = ['Referência','Nome do arquivo'];
+      var wsAnexos = wb.addWorksheet('ANEXOS');
+      wsAnexos.addRows([anexosHead].concat(anexosRows));
+      setColWidths(wsAnexos, [30, 40]);
+      styleHeaderRow(wsAnexos, 0, anexosHead.length);
+      styleDataRows(wsAnexos, 1, anexosRows.length, anexosHead.length, 0);
     }
 
     // ---------- FOTOS (imagens anexadas por resíduo) ----------
@@ -2226,12 +2390,6 @@
     restoreRadioGroups(document, data.radios, function(el){ return !isInsideRepeatable(el); });
   }
 
-  function fotoListText(fotos){
-    return fotos && fotos.length ? ('Anexadas: ' + fotos.map(function(p){ return p.name; }).join(', ')) : '';
-  }
-  function docListText(docs){
-    return docs && docs.length ? ('Anexados: ' + docs.map(function(d){ return d.name; }).join(', ')) : '';
-  }
 
   // ---- fotografa o estado inteiro do formulário ----
   function fotografarEstado(){
@@ -2256,6 +2414,7 @@
       blocks: blocks,
       photos: photos,
       docs: docs,
+      arqGerais: arqGeraisStore.get(arqGeraisRoot) || [],
       page: page2.hidden ? 'page1' : 'page2',
       salvoEm: new Date().toISOString()
     };
@@ -2320,22 +2479,25 @@
           els.forEach(function(b, i){
             var fotos = fotoList[i] || [];
             if(fotos.length){
-              photoStore.set(b, fotos);
               var listEl = b.querySelector('[data-role="photoList"]');
-              if(listEl) listEl.textContent = fotoListText(fotos);
+              setFileListAndRender(b, photoStore, listEl, fotos);
             }
           });
           var docList = (registro.docs && registro.docs[def.addKey]) || [];
           els.forEach(function(b, i){
             var docs = docList[i] || [];
             if(docs.length){
-              docStore.set(b, docs);
               var listEl = b.querySelector('[data-role="docList"]');
-              if(listEl) listEl.textContent = docListText(docs);
+              setFileListAndRender(b, docStore, listEl, docs);
             }
           });
         }
       });
+
+      if(registro.arqGerais && registro.arqGerais.length){
+        var arqListEl = document.querySelector('[data-role="arqGeraisList"]');
+        setFileListAndRender(arqGeraisRoot, arqGeraisStore, arqListEl, registro.arqGerais);
+      }
 
       restoreTopFields(registro.top);
 
@@ -2385,6 +2547,10 @@
       var titleEl = document.getElementById(def.titleId);
       if(titleEl) titleEl.textContent = def.titlePrefix + ' 1';
     });
+
+    arqGeraisStore.delete(arqGeraisRoot);
+    var arqListEl = document.querySelector('[data-role="arqGeraisList"]');
+    if(arqListEl) arqListEl.textContent = '';
 
     mainFormEl.reset();
 
