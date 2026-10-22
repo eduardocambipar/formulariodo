@@ -1207,8 +1207,13 @@
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>
           Baixar Excel (.xlsx)
         </button>
+        <button type="button" class="download-btn" id="emailShareBtn" style="margin-top:8px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 6l8 7 8-7"/></svg>
+          Enviar por e-mail (Excel + fotos)
+        </button>
       </div>
       <span class="dl-status" id="workbookDlStatus" aria-live="polite"></span>
+      <span class="dl-status" id="emailShareStatus" aria-live="polite"></span>
     </div>
   </div>
 
@@ -1283,9 +1288,9 @@
   // seja aberto/hospedado (fallback nativo do navegador via Blob + <a download>).
   // Isso mantém o formulário funcional mesmo fora do Claude, por exemplo se
   // for hospedado em um site próprio da empresa.
-  async function saveFileUniversal(filename, arrayBuffer, onStatus){
+  async function saveFileUniversal(filename, arrayBuffer, onStatus, mimeOverride){
     function report(state){ if(typeof onStatus === 'function'){ try{ onStatus(state); }catch(e){} } }
-    var mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    var mime = mimeOverride || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     var insideClaudeArtifact = (typeof window.claude !== 'undefined');
 
     // 1) Tenta a capability nativa de downloads do Claude — usada quando este
@@ -1384,6 +1389,19 @@
       el.textContent = 'Preparando o download…';
     } else {
       el.textContent = '';
+    }
+  }
+
+  function describeEmailShareStatus(el, state){
+    if(!el) return;
+    el.classList.remove('dl-error');
+    if(state === 'loading'){
+      el.textContent = 'Preparando o e-mail com o Excel e as fotos…';
+    } else if(state === 'eml-ok'){
+      el.textContent = 'Pronto — baixamos um arquivo de e-mail (.eml). Abra ele (geralmente funciona com duplo clique) que o Outlook abre a mensagem já com o Excel e as fotos anexados. Se abrir em modo de leitura, clique em "Encaminhar" para poder preencher o destinatário e enviar.';
+    } else {
+      el.classList.add('dl-error');
+      el.textContent = 'Não foi possível preparar o envio por e-mail agora. Tente novamente, ou use o botão "Baixar Excel" e anexe manualmente.';
     }
   }
 
@@ -2211,6 +2229,166 @@
     return await saveFileUniversal(fname, arrbuf, onStatus);
   }
 
+  // ================= enviar por e-mail (Excel + fotos) =================
+  // O navegador não consegue anexar arquivo num e-mail sozinho — isso é
+  // bloqueado por segurança. O que dá pra fazer:
+  // 1) Se o aparelho suporta compartilhar ARQUIVOS (navigator.share com
+  //    files — funciona bem no celular, e em alguns navegadores/Windows no
+  //    computador): abre o menu de compartilhar do sistema já com o Excel
+  //    e as fotos prontos; a pessoa escolhe "Outlook" (ou Mail, Gmail
+  //    etc.) nesse menu, e o app escolhido abre com os arquivos anexados.
+  // 2) Senão (navegador mais antigo/sem suporte): baixa o Excel e as fotos
+  //    automaticamente, e abre um rascunho de e-mail em branco (sem
+  //    destinatário, sem anexo — isso o navegador não consegue preencher),
+  //    com assunto/corpo já preenchidos e um aviso pra anexar os arquivos
+  //    que acabaram de ser baixados.
+
+  function dataURLToFile(dataUrl, filename, mimeFallback){
+    var partes = String(dataUrl || '').split(',');
+    var head = partes[0] || '';
+    var base64 = partes[1] || '';
+    var match = head.match(/:(.*?);/);
+    var mime = (match && match[1]) || mimeFallback || 'application/octet-stream';
+    var bin = atob(base64);
+    var len = bin.length;
+    var bytes = new Uint8Array(len);
+    for(var i=0; i<len; i++){ bytes[i] = bin.charCodeAt(i); }
+    return new File([bytes], filename, { type: mime });
+  }
+
+  function montarTextoEmailDO(payload){
+    var c = (payload && payload.cadastro) || {};
+    var cliente = c.nomeFantasia || 'cliente';
+    var assunto = 'Dimensionamento Operacional – ' + cliente;
+    var linhas = [
+      'Olá,',
+      '',
+      'Segue o Dimensionamento Operacional preenchido para ' + cliente + ', com a planilha completa e as fotos dos resíduos em anexo.'
+    ];
+    if(c.subunidade) linhas.push('Subunidade: ' + c.subunidade);
+    if(c.solicitante) linhas.push('Solicitante: ' + c.solicitante);
+    if(c.comercial) linhas.push('Comercial responsável: ' + c.comercial);
+    linhas.push('', 'Atenciosamente.');
+    return { assunto: assunto, corpo: linhas.join('\n') };
+  }
+
+  // Junta o Excel gerado + todas as fotos/documentos/arquivos gerais
+  // enviados, como File objects prontos pra anexar.
+  async function coletarAnexosDoEnvio(payload){
+    var arquivos = [];
+
+    try{
+      var wb = buildWorkbook(payload);
+      var buf = await wb.xlsx.writeBuffer();
+      var arrbuf = (buf && buf.buffer && typeof buf.byteOffset === 'number')
+        ? buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength)
+        : buf;
+      var fname = 'DO_' + safeName(payload.cadastro && payload.cadastro.nomeFantasia) + '.xlsx';
+      arquivos.push(new File([arrbuf], fname, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    }catch(e){
+      console.error('Falha ao gerar o Excel para anexar ao e-mail:', e);
+    }
+
+    document.querySelectorAll('#blocksContainer .residuo-block').forEach(function(bloco, idx){
+      var n = idx + 1;
+      (photoStore.get(bloco) || []).forEach(function(f, i){
+        try{ arquivos.push(dataURLToFile(f.dataUrl, 'Residuo' + n + '_Foto' + (i+1) + '_' + (f.name || 'foto.jpg'), f.type)); }
+        catch(e){ console.error('Falha ao converter foto do resíduo ' + n, e); }
+      });
+      (docStore.get(bloco) || []).forEach(function(f, i){
+        try{ arquivos.push(dataURLToFile(f.dataUrl, 'Residuo' + n + '_Doc' + (i+1) + '_' + (f.name || 'documento'), f.type)); }
+        catch(e){ console.error('Falha ao converter documento do resíduo ' + n, e); }
+      });
+    });
+
+    (arqGeraisStore.get(arqGeraisRoot) || []).forEach(function(f, i){
+      try{ arquivos.push(dataURLToFile(f.dataUrl, 'Geral' + (i+1) + '_' + (f.name || 'arquivo'), f.type)); }
+      catch(e){ console.error('Falha ao converter arquivo geral', e); }
+    });
+
+    return arquivos;
+  }
+
+  // ---- montagem do arquivo .eml ----
+  // .eml é o formato de arquivo de e-mail que o Outlook (e praticamente
+  // qualquer programa de e-mail) já sabe abrir diretamente — com assunto,
+  // corpo E anexos reais embutidos no próprio arquivo. É a forma confiável
+  // de "anexar de verdade" sem precisar de servidor nenhum: o navegador só
+  // gera o arquivo; quem abre os anexos de verdade é o Outlook, ao abrir
+  // esse arquivo.
+  function base64EncodeUTF8(str){
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  function wrapBase64Lines(b64){
+    var linhas = [];
+    for(var i=0; i<b64.length; i+=76){ linhas.push(b64.slice(i, i+76)); }
+    return linhas.join('\r\n');
+  }
+
+  function arrayBufferToBase64(buffer){
+    var bytes = new Uint8Array(buffer);
+    var binary = '';
+    var chunk = 0x8000;
+    for(var i=0; i<bytes.length; i+=chunk){
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+    }
+    return btoa(binary);
+  }
+
+  function assuntoCodificado(assunto){
+    // RFC 2047 — necessário pra acentos (ex: "ç", "ã") aparecerem certos no
+    // assunto em qualquer cliente de e-mail.
+    return '=?UTF-8?B?' + base64EncodeUTF8(assunto) + '?=';
+  }
+
+  async function buildEmlBlob(textos, arquivos){
+    var boundary = '----=_DO_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2);
+    var partes = [];
+    partes.push('MIME-Version: 1.0');
+    partes.push('Subject: ' + assuntoCodificado(textos.assunto));
+    partes.push('Content-Type: multipart/mixed; boundary="' + boundary + '"');
+    partes.push('');
+    partes.push('--' + boundary);
+    partes.push('Content-Type: text/plain; charset="UTF-8"');
+    partes.push('Content-Transfer-Encoding: base64');
+    partes.push('');
+    partes.push(wrapBase64Lines(base64EncodeUTF8(textos.corpo)));
+    partes.push('');
+
+    for(var i=0; i<arquivos.length; i++){
+      var f = arquivos[i];
+      var buf = await f.arrayBuffer();
+      var b64 = arrayBufferToBase64(buf);
+      partes.push('--' + boundary);
+      partes.push('Content-Type: ' + (f.type || 'application/octet-stream') + '; name="' + f.name + '"');
+      partes.push('Content-Transfer-Encoding: base64');
+      partes.push('Content-Disposition: attachment; filename="' + f.name + '"');
+      partes.push('');
+      partes.push(wrapBase64Lines(b64));
+      partes.push('');
+    }
+
+    partes.push('--' + boundary + '--');
+    partes.push('');
+
+    return new Blob([partes.join('\r\n')], { type: 'message/rfc822' });
+  }
+
+  async function enviarPorEmailComAnexos(payload, onStatus){
+    function report(state){ if(typeof onStatus === 'function'){ try{ onStatus(state); }catch(e){} } }
+    report('loading');
+
+    var textos = montarTextoEmailDO(payload);
+    var arquivos = await coletarAnexosDoEnvio(payload);
+
+    var emlBlob = await buildEmlBlob(textos, arquivos);
+    var emlBuf = await emlBlob.arrayBuffer();
+    var fname = 'Email_DO_' + safeName(payload.cadastro && payload.cadastro.nomeFantasia) + '.eml';
+    var resultado = await saveFileUniversal(fname, emlBuf, null, 'message/rfc822');
+    report(resultado && resultado.ok ? 'eml-ok' : 'fail');
+  }
+
   // ================= submit flow =================
   var lastPayload = null;
   var form = document.getElementById('mainForm');
@@ -2264,6 +2442,13 @@
 
   document.getElementById('downloadXlsxBtn').addEventListener('click', function(){
     if(lastPayload) exportWorkbookWithFeedback(lastPayload);
+  });
+
+  document.getElementById('emailShareBtn').addEventListener('click', function(){
+    if(!lastPayload) return;
+    var el = document.getElementById('emailShareStatus');
+    enviarPorEmailComAnexos(lastPayload, function(state){ describeEmailShareStatus(el, state); })
+      .catch(function(e){ console.error(e); describeEmailShareStatus(el, 'fail'); });
   });
 
   // ================= limpar formulário + rascunho automático (IndexedDB) =================
