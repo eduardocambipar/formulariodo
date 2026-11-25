@@ -1948,18 +1948,25 @@
 
   // ---- Visual design extraído do modelo MODELO_DIMENSIONAMENTO_OPERACIONAL__NE.xlsx ----
   // (fontes/cores/bordas do template oficial, aplicadas na planilha gerada pelo formulário)
+  // Paleta extraída das 3 planilhas reais (skill dimensionamento-twm-residuos-v3):
+  // cabeçalhos em verde-limão (B8FE00) com texto preto em negrito, fonte
+  // corporativa Neo Sans Pro (a mesma já usada na página — ver @font-face no
+  // topo do arquivo); linhas de dado em branco com borda fina, e a coluna
+  // "Ref." numerada em cinza claro (F2F2F2). O preenchimento FFF2CC usado nas
+  // linhas de dado da DO bate exatamente com a cor de tema (accent4, tint 0.8)
+  // das planilhas de referência.
   var XLS = {
-    fontTitle: {name:'Tahoma', size:11, bold:true, color:{argb:'FFFFFFFF'}},
-    fontHeader: {name:'Tahoma', size:9, bold:true, color:{argb:'FFFFFFFF'}},
-    fontData: {name:'Calibri', size:10, color:{argb:'FF000000'}},
-    fontDataBold: {name:'Calibri', size:10, bold:true, color:{argb:'FF000000'}},
-    fontDoTitle: {name:'Tahoma', size:11, bold:true, color:{argb:'FF000000'}},
-    fontDoHeader: {name:'Tahoma', size:10, bold:true, color:{argb:'FFFFFFFF'}},
-    fontDoData: {name:'Tahoma', size:10, color:{argb:'FF000000'}},
-    fillTeal: {type:'pattern', pattern:'solid', fgColor:{argb:'FF0D786B'}},
-    fillTeal2: {type:'pattern', pattern:'solid', fgColor:{argb:'FF006F62'}},
-    fillLime: {type:'pattern', pattern:'solid', fgColor:{argb:'FFD4FF00'}},
-    fillGreen: {type:'pattern', pattern:'solid', fgColor:{argb:'FFE2F0D9'}},
+    fontTitle: {name:'Neo Sans Pro', size:11, bold:true, color:{argb:'FF000000'}},
+    fontHeader: {name:'Neo Sans Pro', size:9, bold:true, color:{argb:'FF000000'}},
+    fontData: {name:'Neo Sans Pro', size:10, color:{argb:'FF000000'}},
+    fontDataBold: {name:'Neo Sans Pro', size:10, bold:true, color:{argb:'FF000000'}},
+    fontDoTitle: {name:'Neo Sans Pro', size:11, bold:true, color:{argb:'FF000000'}},
+    fontDoHeader: {name:'Neo Sans Pro', size:10, bold:true, color:{argb:'FF000000'}},
+    fontDoData: {name:'Neo Sans Pro', size:10, color:{argb:'FF000000'}},
+    fillTeal: {type:'pattern', pattern:'solid', fgColor:{argb:'FFB8FE00'}},
+    fillTeal2: {type:'pattern', pattern:'solid', fgColor:{argb:'FFB8FE00'}},
+    fillLime: {type:'pattern', pattern:'solid', fgColor:{argb:'FFB8FE00'}},
+    fillGreen: {type:'pattern', pattern:'solid', fgColor:{argb:'FFF2F2F2'}},
     fillAmber: {type:'pattern', pattern:'solid', fgColor:{argb:'FFFFF2CC'}},
     alignCenter: {horizontal:'center', vertical:'middle', wrapText:true},
     alignCenterNoWrap: {horizontal:'center', vertical:'middle'},
@@ -2053,10 +2060,13 @@
   ];
 
   function buildBaseSheet(wb){
+    // BASE é uma lista de referência (combos), não uma tabela de dados — no
+    // modelo real seu cabeçalho fica em cinza claro, não no verde-limão usado
+    // nas demais abas.
     var ws = wb.addWorksheet('BASE');
     ws.addRows(BASE_SHEET_DATA);
     setColWidths(ws, BASE_SHEET_DATA[0].map(function(){ return 22; }));
-    styleHeaderRow(ws, 0, BASE_SHEET_DATA[0].length);
+    styleRange(ws, 0, 0, 0, BASE_SHEET_DATA[0].length-1, {font:XLS.fontDataBold, fill:XLS.fillGreen, alignment:XLS.alignCenter, border:XLS.borderAll});
     return ws;
   }
 
