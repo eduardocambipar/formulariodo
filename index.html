@@ -1973,7 +1973,9 @@
     alignLeft: {horizontal:'left', vertical:'middle', wrapText:true}
   };
   (function(){
-    var thin = {style:'thin', color:{argb:'FF000000'}};
+    // Cinza claro (D9D9D9) — mesma cor de borda usada em todas as abas das
+    // planilhas de referência (não é preto).
+    var thin = {style:'thin', color:{argb:'FFD9D9D9'}};
     XLS.borderAll = {top:thin, bottom:thin, left:thin, right:thin};
   })();
 
@@ -2018,63 +2020,11 @@
     }
   }
 
-  // ---- Aba "BASE": listas de referência (combos/validações) do modelo oficial
-  // de Dimensionamento Operacional (skill dimensionamento-twm-residuos-v3).
-  // Conteúdo estático — igual em qualquer dimensionamento, não vem do formulário.
-  var BASE_SHEET_DATA = [
-    ['CONSULTOR','PRAZO CONTRATUAL','ESCOPO','ITENÇÃO DO CLIENTE','MÃO-DE-OBRA','JORNADA DE TRABALHO','EQUIPAMENTO','EQUIPAMENTO P/ ACONDICIONAMENTO','PERÍODO','CLASSE DO RESÍDUO','RESP. RESÍDUO','TECN. DESTINAÇÃO','SELEÇÃO','SELEÇÃO INSALUBRIDADE','REFEIÇÃO','UNID. MEDIDA','VEÍCULO','SERVIÇOS','RECEPTORES/DESTINADORES','UF','ORIGEM:'],
-    ['ADRIANO TEOFILO','SPOT','GERENCIAMENTO TOTAL','ACRESCIMO DE SERVIÇOS NO CONTRATO','AUXILIAR DE SERVIÇOS (ASG)','ADM 1 - Seg. à Sex. - 07h00 às 16h48','BALANÇA','BIG BAG','MENSAL','CLASSE I','CLIENTE','ATERRO','SIM','SIM - 10%','AMBIPAR','KG','BASCULANTE','CARGA/DESCARGA','ALAGOAS AMBIENTAL','PE (Muribeca)','ATIVA'],
-    ['ALLAN GOMES','12 MESES','COLETA E TRANSPORTE DE RESÍDUOS CLASSE I','ATUALIZAÇÃO DE CONTRATO','AUXILIAR DE COLETA','ADM 2 - Seg. à Sex. - 07h00 às 16h00 e Sáb. - 08h00 às 12h00','BIG BAG','BOMBONA','DIÁRIA','CLASSE II','AMBIPAR','COMPOSTAGEM','NÃO','SIM - 20%','CLIENTE','TON','BAÚ','HIDROJATEAMENTO','AMBIPAR ALAGOAS','PE (Petrolina)','PASSIVA'],
-    ['ANA','24 MESES','COLETA, TRANSPORTE E DESTINAÇÃO DE RESÍDUOS CLASSE I','ATUALIZAÇÃO DE PPU','ENCARREGADO','6x2 - 06h00 / 14h00 / 22h00 / 06h00','BIOCOMPOSTEIRA','CAÇAMBA ABERTA','','','COMPRA','COPROCESSAMENTO','N/A','SIM - 40%','','M3','COMPACTADOR','MOBILIZAÇÃO/DESMOBILIZAÇÃO','AMBIPAR BAHIA (SIMÕES FILHO)','PB (João Pessoa)','INDICAÇÃO'],
-    ['CLEVERTON RODRIGO','36 MESES','COLETA E TRANSPORTE DE RESÍDUOS CLASSE II','NOVO ESCOPO','GESTOR DE MEIO AMBIENTE','6x1 - 06h00 / 14h00 / 22h00 / 06h00','BOMBONA','CAÇAMBA CANGURU ABERTA','','','DOAÇÃO','DESCARACTERIZAÇÃO','','NÃO','','LTS','HIDROJATO','MOVIMENTAÇÃO EXTERNA','AMBIPAR CAMPINA GRANDE','PB (Campina Grande)',''],
-    ['CRISTINA','48 MESES','COLETA, TRANSPORTE E DESTINAÇÃO DE RESÍDUOS CLASSE II','SERVIÇO NUNCA ANTES EXECUTADO','MECÂNICO','12x36 - 06h00 / 18h00 / 06h00','CAÇAMBA ABERTA','CAÇAMBA CANGURU FECHADA','','','VENDA','DESCONTAMINAÇÃO','','','','UND','JULIETA','MOVIMENTAÇÃO INTERNA','AMBIPAR CAUCAIA','RN (Natal)',''],
-    ['DJALMA ROCHA','60 MESES','COLETA E TRANSPORTE DE RESÍDUOS CLASSE I E II','','MOTORISTA DE CAMINHÃO','','CAÇAMBA CANGURU ABERTA','CAÇAMBA COMPACTADORA ESTACIONÁRIA','','','','ETE','','','','','MUNCK','SUCÇÃO COM SUPERVÁCUO','AMBIPAR JOAO PESSOA','RN (Mossoró))',''],
-    ['FERNANDO PESSOA','','COLETA, TRANSPORTE E DESTINAÇÃO DE RESÍDUOS CLASSE I E II','','OPERADOR DE PRENSA','','CAÇAMBA CANGURU FECHADA','CAÇAMBA FECHADA','','','','INCINERAÇÃO','','','','','POLIGUINDASTE','','AMBIPAR MOSSORÓ','CE',''],
-    ['GOETHE','','COMPRA DE RECICLÁVEIS','','OPERADOR DE EMPILHADEIRA','','CAÇAMBA COMPACTADORA ESTACIONÁRIA','COLETOR','','','','LOGÍSTICA REVERSA','','','','','ROLL ON/OFF','','AMBIPAR MURIBECA','AL',''],
-    ['JADSON','','LOCAÇÃO DE EQUIPAMENTOS','','OPERADOR DE RETROESCAVADEIRA','','CAÇAMBA FECHADA','CONTEINER','','','','RECICLAGEM','','','','','SIDER','','AMBIPAR NATAL','BA',''],
-    ['LUCAS FRANKLIN','','MOVIMENTAÇÃO INTERNA','','SUPERVISOR OPERACIONAL','','COLETOR','CONTENTOR','','','','RECONDICIONAMENTO','','','','','SUPERVÁCULO','','AMBIPAR PETROLINA','OUTRO LOCAL',''],
-    ['LUCIANA BEZERRA','','SERVIÇO ESPECIAL','','TÉCNICO DE. SEGURANÇA DO TRABALHO','','CONTEINER','IBC','','','','','','','','','TANQUE','','AMBIPAR SAÚDE','',''],
-    ['MITCHEL','','','','TÉNICO MEIO AMBIENTE','','CONTENTOR','LIXEIRA','','','','','','','','','','','AMBIPAR WASTE TO ENERGY - CE','',''],
-    ['THAIANE','','','','','','EMPILHADEIRA','SACO','','','','','','','','','','','AMBIPAR WASTE TO ENERGY - PB (ECOLÓGICA)','',''],
-    ['VIVIANE GUIMARÃES','','','','','','IBC','TAMBOR','','','','','','','','','','','AMBISMART (EFLUENTES)','',''],
-    ['','','','','','','LIXEIRA','','','','','','','','','','','','ATERRO SANITÁRIO DE CAUCÁIA / ASMOC','',''],
-    ['','','','','','','PALLET DE POLIETILENO CONTENÇÃO','','','','','','','','','','','','BIOFORTH (EFLUENTES)','',''],
-    ['','','','','','','PRENSA','','','','','','','','','','','','BRASECO','',''],
-    ['','','','','','','SACO','','','','','','','','','','','','CICLO AMBIENTAL LTDA','',''],
-    ['','','','','','','TAMBOR','','','','','','','','','','','','CRN','',''],
-    ['','','','','','','','','','','','','','','','','','','CTR CARUARU','',''],
-    ['','','','','','','','','','','','','','','','','','','CTR PE / ECOPARQUE','',''],
-    ['','','','','','','','','','','','','','','','','','','CTR PETROLINA','',''],
-    ['','','','','','','','','','','','','','','','','','','ECOSOLO','',''],
-    ['','','','','','','','','','','','','','','','','','','ESSENCIS BA S.A / ANTIGA HERA AMBIENTAL','',''],
-    ['','','','','','','','','','','','','','','','','','','ETE','',''],
-    ['','','','','','','','','','','','','','','','','','','FOXX','',''],
-    ['','','','','','','','','','','','','','','','','','','LÓGICA AMBIENTAL','',''],
-    ['','','','','','','','','','','','','','','','','','','ORIZON MEIO AMBIENTE S.A (CTR  CANDEIAS)','',''],
-    ['','','','','','','','','','','','','','','','','','','PROJETO CONSTRUÇÕES E SERVIÇOS','',''],
-    ['','','','','','','','','','','','','','','','','','','RCC AMBIENTAL','',''],
-    ['','','','','','','','','','','','','','','','','','','REBRITE','',''],
-    ['','','','','','','','','','','','','','','','','','','RECOVERY (EFLUENTES)','',''],
-    ['','','','','','','','','','','','','','','','','','','RN SOLUÇÕES AMBIENTAIS','',''],
-    ['','','','','','','','','','','','','','','','','','','RUMOS ENGENHARIA AMBIENTAL LTDA','',''],
-  ];
-
-  function buildBaseSheet(wb){
-    // BASE é uma lista de referência (combos), não uma tabela de dados — no
-    // modelo real seu cabeçalho fica em cinza claro, não no verde-limão usado
-    // nas demais abas.
-    var ws = wb.addWorksheet('BASE');
-    ws.addRows(BASE_SHEET_DATA);
-    setColWidths(ws, BASE_SHEET_DATA[0].map(function(){ return 22; }));
-    styleRange(ws, 0, 0, 0, BASE_SHEET_DATA[0].length-1, {font:XLS.fontDataBold, fill:XLS.fillGreen, alignment:XLS.alignCenter, border:XLS.borderAll});
-    return ws;
-  }
-
   // ---- Aba "PPU": planilha de preços unitários em branco (o time preenche
   // manualmente depois — não é alimentada pelo formulário). Mantém a mesma
   // numeração automática e fórmula de total do modelo oficial.
   function buildPpuSheet(wb){
-    var ws = wb.addWorksheet('PPU');
+    var ws = wb.addWorksheet('PPU', {state:'hidden'});
     setColWidths(ws, [4,4,36,30,16,14,14,16]);
     function set(r,c,v){ ws.getCell(r,c).value = v; }
     set(4,8,'PPU - Planilha de Preços Unitários');
@@ -2101,7 +2051,7 @@
     var head = ['REF.:','DESCRIÇÃO','VEÍCULO','CAPACIDADE','PERÍODO DE TRABALHO','QTD.','HORÁRIO INÍCIO','HORÁRIO FIM','VEÍCULO RETORNA PARA BASE DIARIAMENTE ?','COMBUSTÍVEL PAGO PELA AMBIPAR ? ','KM MÉDIO DIÁRIO','LINK DO LOCAL DE SAÍDA DO VEÍCULO','LINK DO LOCAL DO CLIENTE/SERVIÇO','LINK DO LOCAL DE RETORNO DO VEÍCULO','ATRIBUIÇÕES/ATIVIDADES/OBSERVAÇÕES'];
     var rows = [];
     for(var i=1;i<=10;i++) rows.push([i]);
-    var ws = wb.addWorksheet('MOVIMENTAÇÕES INTERNAS');
+    var ws = wb.addWorksheet('MOVIMENTAÇÕES INTERNAS', {state:'hidden'});
     ws.addRows([head].concat(rows));
     setColWidths(ws, [5,24,16,12,18,6,12,12,16,16,12,22,22,22,40]);
     styleHeaderRow(ws, 0, head.length);
@@ -2116,7 +2066,7 @@
   // preenchimento manual, igual à PPU e à BASE.
   function buildMemoriaEquipamentosSheet(wb){
     var head = ['Nº','Resíduo (DO)','Classe (DO)','Geração (t/mês c/ variação – DO ÷ 1000)','Código equip.','Equipamento','Volume (m³)','Veículo','Carga útil (t)','Nº equip./viagem','Densidade aparente solta (t/m³)','Fator compactação','Taxa de enchimento','Peso calculado (t/viagem)','Peso informado (t/viagem – override)','Peso adotado (t/viagem)','Viagens/mês','Equip. Em uso','Reserva','Qtd. Total equip.','Dedicado','Tem Classe I','Tem Classe II','Observação','Grupo de giro (reserva compartilhada)'];
-    var ws = wb.addWorksheet('MEMÓRIA EQUIPAMENTOS');
+    var ws = wb.addWorksheet('MEMÓRIA EQUIPAMENTOS', {state:'hidden'});
     ws.addRow(head);
     setColWidths(ws, head.map(function(){ return 16; }));
     styleHeaderRow(ws, 0, head.length);
@@ -2139,9 +2089,6 @@
     var wb = new ExcelJS.Workbook();
     var c = payload.cadastro || {};
     var enc = payload.encerramento || {};
-
-    // ---------- BASE (listas de referência estáticas do modelo) ----------
-    buildBaseSheet(wb);
 
     // ---------- INFORMAÇÕES GERAIS ----------
     var entrega = [c.dataEntrega, c.horarioEntrega].filter(Boolean).join(' às ');
@@ -2225,7 +2172,7 @@
     var despHead = ['Ref.:','Descrição','Qtd.','Observações / detalhes'];
     var despRows = [];
     for(var di=1; di<=10; di++) despRows.push([di]);
-    var wsDesp = wb.addWorksheet('DESPESAS DIVERSAS ADICIONAIS');
+    var wsDesp = wb.addWorksheet('DESPESAS DIVERSAS ADICIONAIS', {state:'hidden'});
     wsDesp.addRows([despHead].concat(despRows));
     setColWidths(wsDesp, [5, 32, 8, 40]);
     styleHeaderRow(wsDesp, 0, despHead.length);
@@ -2252,10 +2199,19 @@
     wsDo.addRows([doTitle, doHead].concat(doRows));
     setColWidths(wsDo, [3, 20, 16, 14, 20, 14, 14, 12, 18, 14, 12, 12, 16, 20, 16, 20, 16, 16, 16, 14, 14, 14, 14, 14, 16]);
     var doLastCol = doHead.length - 1;
-    styleCell(wsDo, 0, 1, {font:XLS.fontDoTitle, fill:XLS.fillLime, alignment:{horizontal:'left', vertical:'middle', wrapText:false}});
+    // Título mesclado e preenchido por toda a largura da tabela (igual ao
+    // modelo original — antes só a primeira célula ficava colorida, por isso
+    // o título parecia "encolhido" no canto esquerdo).
+    mergeRange(wsDo, 0, 1, 0, doLastCol);
+    styleRange(wsDo, 0, 1, 0, doLastCol, {font:XLS.fontDoTitle, fill:XLS.fillLime, alignment:XLS.alignCenter});
     styleRange(wsDo, 1, 1, 1, doLastCol, {font:XLS.fontDoHeader, fill:XLS.fillTeal2, alignment:XLS.alignCenter, border:XLS.borderAll});
     var doTextCols = {1:1, 14:1, 15:1}; // Resíduo, Tratamento, Destinador → alinhados à esquerda
-    for(var doR = 2; doR < 2 + doRows.length; doR++){
+    // O modelo oficial sempre reserva um "canvas" de pelo menos 20 linhas com a
+    // cor de fundo e as bordas já aplicadas (prontas para receber dados), mesmo
+    // quando ainda não há nenhum resíduo preenchido — por isso estilizamos no
+    // mínimo 20 linhas, e mais se houver mais resíduos do que isso.
+    var doCanvasRows = Math.max(20, doRows.length);
+    for(var doR = 2; doR < 2 + doCanvasRows; doR++){
       for(var doC = 1; doC <= doLastCol; doC++){
         var doAlign = doTextCols[doC] ? XLS.alignLeft : XLS.alignCenterNoWrap;
         styleCell(wsDo, doR, doC, {font:XLS.fontDoData, fill:XLS.fillAmber, alignment:doAlign, border:XLS.borderAll});
@@ -2272,7 +2228,7 @@
     wsDo.getColumn(doInfoValCol + 1).width = 34;
     mergeRange(wsDo, 0, doInfoCol, 0, doInfoValCol);
     setCellValue(wsDo, 0, doInfoCol, 'Identificação do Cliente');
-    styleCell(wsDo, 0, doInfoCol, {font:XLS.fontDoHeader, fill:XLS.fillTeal2, alignment:XLS.alignCenter, border:XLS.borderAll});
+    styleRange(wsDo, 0, doInfoCol, 0, doInfoValCol, {font:XLS.fontDoHeader, fill:XLS.fillTeal2, alignment:XLS.alignCenter, border:XLS.borderAll});
     var doInfoRows = [
       ['Razão Social:', c.nomeFantasia || ''],
       ['Nº CNPJ:', c.cnpj || ''],
@@ -2286,31 +2242,25 @@
       styleCell(wsDo, r, doInfoValCol, {font:XLS.fontDoData, fill:XLS.fillAmber, alignment:XLS.alignLeft, border:XLS.borderAll});
     });
 
-    // ---------- DADOS DE APOIO - RESÍDUOS (aba extra: dados coletados pelo
-    // formulário sem célula própria no modelo oficial — transportador, condição
-    // comercial, equipamento de transporte externo, laudo, taxa mínima) ----------
-    if(payload.residuos && payload.residuos.length){
-      var apoioHead = ['Ref.','Tipo de Resíduo','Transportador','Condição comercial','Equipamento de Transporte Externo (apoio)','Laudo de Destruição/Descaracterização (só sucata)','Preço/condição comercial informada (apoio)','Taxa mínima de enchimento (apoio)'];
-      var apoioRows = payload.residuos.map(function(r,i){
-        return [i+1, r.tipo, r.transportador || '', r.condComercial || '', r.equipamentoTransporte, r.laudo, r.preco, r.taxaMinima];
-      });
-      var wsApoio = wb.addWorksheet('DADOS DE APOIO - RESÍDUOS');
-      wsApoio.addRows([apoioHead].concat(apoioRows));
-      setColWidths(wsApoio, [5, 20, 20, 20, 24, 30, 30, 20]);
-      styleHeaderRow(wsApoio, 0, apoioHead.length);
-      styleDataRows(wsApoio, 1, apoioRows.length, apoioHead.length, 0);
-    }
-
     // ---------- FOTOS (imagens anexadas por resíduo) — primeiro, mesma ordem do primeiro
-    // botão de upload do bloco de Resíduo no formulário (Foto antes de Documentos) ----------
+    // botão de upload do bloco de Resíduo no formulário (Foto antes de Documentos).
+    // A aba sempre existe (faz parte das 5 abas visíveis do modelo oficial),
+    // mesmo sem nenhuma foto ainda — igual ao modelo em branco. ----------
     var residuosComFoto = (payload.residuos||[]).filter(function(r){ return r.fotos && r.fotos.length; });
+    var totalFotos = residuosComFoto.reduce(function(acc,r){ return acc + r.fotos.length; }, 0);
+    var wsFotos = wb.addWorksheet('FOTOS');
+    setColWidths(wsFotos, [26, 26, 26]);
+    mergeRange(wsFotos, 0, 0, 0, 2);
+    wsFotos.getCell(1,1).value = 'Relatório fotográfico';
+    styleRange(wsFotos, 0, 0, 0, 2, {font:XLS.fontDoTitle, fill:XLS.fillLime, alignment:XLS.alignCenter});
+    mergeRange(wsFotos, 1, 0, 1, 2);
+    wsFotos.getCell(2,1).value = 'Cliente: ' + (c.nomeFantasia || '') + ' | Fotos da visita técnica enviadas pelo usuário (' + totalFotos + ' foto' + (totalFotos===1?'':'s') + ')';
+    styleCell(wsFotos, 1, 0, {font:XLS.fontData, alignment:XLS.alignLeft});
     if(residuosComFoto.length){
-      var wsFotos = wb.addWorksheet('FOTOS');
-      setColWidths(wsFotos, [26, 26, 26]);
       var fotosPerRow = 3;
       var fotoImgW = 180, fotoImgH = 135;
       var fotoRowsPerImg = 8; // altura reservada em "linhas" de grade para cada imagem
-      var fotoCursor = 0;
+      var fotoCursor = 3;
       residuosComFoto.forEach(function(r){
         var refIdx = (payload.residuos||[]).indexOf(r) + 1;
         wsFotos.getCell(fotoCursor+1, 1).value = 'Ref. ' + refIdx + ' — ' + (r.tipo || '');
@@ -2335,6 +2285,21 @@
         var rowBlocksUsed = Math.max(1, Math.ceil(r.fotos.length / fotosPerRow));
         fotoCursor += (rowBlocksUsed * fotoRowsPerImg) + 2;
       });
+    }
+
+    // ---------- DADOS DE APOIO - RESÍDUOS (aba extra: dados coletados pelo
+    // formulário sem célula própria no modelo oficial — transportador, condição
+    // comercial, equipamento de transporte externo, laudo, taxa mínima) ----------
+    if(payload.residuos && payload.residuos.length){
+      var apoioHead = ['Ref.','Tipo de Resíduo','Transportador','Condição comercial','Equipamento de Transporte Externo (apoio)','Laudo de Destruição/Descaracterização (só sucata)','Preço/condição comercial informada (apoio)','Taxa mínima de enchimento (apoio)'];
+      var apoioRows = payload.residuos.map(function(r,i){
+        return [i+1, r.tipo, r.transportador || '', r.condComercial || '', r.equipamentoTransporte, r.laudo, r.preco, r.taxaMinima];
+      });
+      var wsApoio = wb.addWorksheet('DADOS DE APOIO - RESÍDUOS');
+      wsApoio.addRows([apoioHead].concat(apoioRows));
+      setColWidths(wsApoio, [5, 20, 20, 20, 24, 30, 30, 20]);
+      styleHeaderRow(wsApoio, 0, apoioHead.length);
+      styleDataRows(wsApoio, 1, apoioRows.length, apoioHead.length, 0);
     }
 
     // ---------- ANEXOS (lista de nomes — documentos por resíduo + arquivos gerais; não
